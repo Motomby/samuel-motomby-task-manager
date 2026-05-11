@@ -55,6 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _goalControllers.map((c) => c.text.trim()).toList();
           _isEditing = false;
         });
+        globalProfile.save(); // Persist to storage
       }
     } else {
       // Enter edit mode
@@ -143,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Row(
                     children: [
-                      const Icon(Icons.star, color: Colors.teal),
+                      const Icon(Icons.star, color: Colors.blue),
                       const SizedBox(width: 16),
                       Expanded(
                         child: _buildEditableTextField(
@@ -156,6 +157,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 );
               }),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _toggleEdit,
+                  icon: Icon(_isEditing ? Icons.save : Icons.edit),
+                  label: Text(
+                    _isEditing ? 'Save Profile' : 'Edit Profile',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
             ],
           ),
         ),

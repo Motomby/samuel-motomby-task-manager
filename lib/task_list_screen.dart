@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'profile_screen.dart';
 import 'models/task.dart';
 import 'widgets/task_card.dart';
@@ -13,45 +15,68 @@ class TaskListScreen extends StatefulWidget {
 }
 
 class _TaskListScreenState extends State<TaskListScreen> {
-  final List<Task> _tasks = [
-    Task(
-      title: 'Complete Flutter Assignment',
-      description: 'Finish the Task Manager app assignment with all the required features including models, lists, and navigation.',
-      category: 'School',
-      priority: 'High',
-      dueDate: DateTime.now().add(const Duration(days: 2)),
-    ),
-    Task(
-      title: 'Study for Midterms',
-      description: 'Review notes and practice problems for the upcoming midterms.',
-      category: 'School',
-      priority: 'High',
-      dueDate: DateTime.now().add(const Duration(days: 5)),
-    ),
-    Task(
-      title: 'Go to the Gym',
-      description: 'Leg day routine with 30 mins of cardio.',
-      category: 'Health',
-      priority: 'Medium',
-      dueDate: DateTime.now().add(const Duration(days: 1)),
-    ),
-  ];
+  final List<Task> _tasks = [];
 
   String _currentFilter = 'All';
+  String _currentSort = 'None';
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTasks();
+  }
+
+  Future<void> _saveTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String encodedData =
+        jsonEncode(_tasks.map((t) => t.toJson()).toList());
+    await prefs.setString('user_tasks', encodedData);
+  }
+
+  Future<void> _loadTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? data = prefs.getString('user_tasks');
+    if (data != null) {
+      final List<dynamic> decodedData = jsonDecode(data);
+      setState(() {
+        _tasks.clear();
+        _tasks.addAll(decodedData.map((t) => Task.fromJson(t)).toList());
+      });
+    }
+  }
 
   List<Task> get _filteredTasks {
+    List<Task> tasksToDisplay = List.from(_tasks);
+
     if (_currentFilter == 'Pending') {
-      return _tasks.where((t) => !t.isCompleted).toList();
+      tasksToDisplay = tasksToDisplay.where((t) => !t.isCompleted).toList();
     } else if (_currentFilter == 'Completed') {
-      return _tasks.where((t) => t.isCompleted).toList();
+      tasksToDisplay = tasksToDisplay.where((t) => t.isCompleted).toList();
     }
-    return _tasks;
+
+    if (_searchController.text.isNotEmpty) {
+      tasksToDisplay = tasksToDisplay.where((t) =>
+          t.title.toLowerCase().contains(_searchController.text.toLowerCase())).toList();
+    }
+
+    if (_currentSort == 'DueDate') {
+      tasksToDisplay.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    } else if (_currentSort == 'Priority') {
+      final priorityMap = {'High': 0, 'Medium': 1, 'Low': 2};
+      tasksToDisplay.sort((a, b) =>
+          priorityMap[a.priority]!.compareTo(priorityMap[b.priority]!));
+    }
+
+    return tasksToDisplay;
   }
 
   void _deleteTask(Task task) {
     setState(() {
       _tasks.remove(task);
     });
+    _saveTasks();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Task deleted')),
     );
@@ -61,23 +86,106 @@ class _TaskListScreenState extends State<TaskListScreen> {
     setState(() {
       task.isCompleted = !task.isCompleted;
     });
+    _saveTasks();
+  }
+
+  void _clearAllTasks() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear All Tasks'),
+        content: const Text('Are you sure you want to delete all tasks? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _tasks.clear();
+              });
+              _saveTasks();
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('All tasks cleared')),
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Clear All'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String label, int count) {
+    return Column(
+      children: [
+        Text(
+          count.toString(),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    int totalTasks = _tasks.length;
+    int completedTasks = _tasks.where((t) => t.isCompleted).length;
+    int pendingTasks = totalTasks - completedTasks;
+    double completionPercentage = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Task Manager'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Search tasks...',
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
+                  setState(() {});
+                },
+              )
+            : const Text('Task Manager'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
           IconButton(
-            icon: const Icon(Icons.person),
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
-              );
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  _searchController.clear();
+                }
+              });
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_sweep),
+            tooltip: 'Clear All',
+            onPressed: _tasks.isEmpty ? null : _clearAllTasks,
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.sort),
+            tooltip: 'Sort tasks',
+            onSelected: (value) {
+              setState(() {
+                _currentSort = value;
+              });
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'None', child: Text('Default Order')),
+              const PopupMenuItem(value: 'DueDate', child: Text('Due Date (Earliest First)')),
+              const PopupMenuItem(value: 'Priority', child: Text('Priority (High to Low)')),
+            ],
           ),
         ],
       ),
@@ -99,6 +207,47 @@ class _TaskListScreenState extends State<TaskListScreen> {
                     _currentFilter = newSelection.first;
                   });
                 },
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Card(
+              elevation: 0,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatItem('Total', totalTasks),
+                        _buildStatItem('Completed', completedTasks),
+                        _buildStatItem('Pending', pendingTasks),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: completionPercentage,
+                        minHeight: 10,
+                        backgroundColor: Colors.grey.shade200,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${(completionPercentage * 100).toInt()}% Completed',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blue.shade700,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -153,6 +302,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                                 _deleteTask(task);
                               } else {
                                 setState(() {});
+                                _saveTasks();
                               }
                             });
                           },
@@ -175,6 +325,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                   setState(() {
                     _tasks.add(newTask);
                   });
+                  _saveTasks();
                 },
               );
             },

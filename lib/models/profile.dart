@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Profile {
   String name;
   String studentId;
@@ -12,17 +15,49 @@ class Profile {
     required this.bio,
     required this.goals,
   });
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'studentId': studentId,
+        'programme': programme,
+        'bio': bio,
+        'goals': goals,
+      };
+
+  factory Profile.fromJson(Map<String, dynamic> json) => Profile(
+        name: json['name'] ?? '',
+        studentId: json['studentId'] ?? '',
+        programme: json['programme'] ?? '',
+        bio: json['bio'] ?? '',
+        goals: List<String>.from(json['goals'] ?? []),
+      );
+
+  Future<void> save() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_profile', jsonEncode(toJson()));
+  }
+
+  static Future<Profile> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString('user_profile');
+    if (data != null) {
+      return Profile.fromJson(jsonDecode(data));
+    }
+    return Profile(
+      name: '',
+      studentId: '',
+      programme: '',
+      bio: '',
+      goals: ['', '', ''],
+    );
+  }
 }
 
 // Global instance for simple state management in this scope
-final Profile globalProfile = Profile(
-  name: 'Ekema',
-  studentId: '12345678',
-  programme: 'Computer Science',
-  bio: 'I am a passionate software engineering student focusing on mobile development. I love building intuitive and aesthetically pleasing user interfaces. In my free time, I enjoy reading tech blogs and contributing to open-source projects.',
-  goals: [
-    'Master Flutter and Dart',
-    'Achieve a GPA of 3.8 or higher',
-    'Complete a major side project',
-  ],
+Profile globalProfile = Profile(
+  name: '',
+  studentId: '',
+  programme: '',
+  bio: '',
+  goals: ['', '', ''],
 );

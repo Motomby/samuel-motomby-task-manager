@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'task_list_screen.dart';
+import 'screens/main_screen.dart';
 
-void main() {
+import 'models/profile.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  globalProfile = await Profile.load();
   runApp(const TaskManagerApp());
 }
 
@@ -14,10 +18,10 @@ class TaskManagerApp extends StatelessWidget {
       title: 'Task Manager',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const TaskListScreen(),
+      home: const MainScreen(),
     );
   }
 }
