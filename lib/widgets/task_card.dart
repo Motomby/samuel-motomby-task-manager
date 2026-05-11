@@ -24,11 +24,22 @@ class TaskCard extends StatelessWidget {
     }
   }
 
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'School': return const Color(0xFF5B7EDB);
+      case 'Personal': return const Color(0xFFA569BD);
+      case 'Health': return const Color(0xFFE85D75);
+      case 'Work': return const Color(0xFF28A745);
+      case 'Other': return const Color(0xFFFFA500);
+      default: return Colors.grey;
+    }
+  }
+
   Color _getPriorityColor(String priority) {
     switch (priority) {
-      case 'High': return Colors.red;
-      case 'Medium': return Colors.orange;
-      case 'Low': return Colors.green;
+      case 'High': return const Color(0xFFDC3545);
+      case 'Medium': return const Color(0xFFFFC107);
+      case 'Low': return const Color(0xFF28A745);
       default: return Colors.grey;
     }
   }
@@ -98,43 +109,39 @@ class TaskCard extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(6),
+                      color: _getCategoryColor(task.category).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
-                      _getCategoryIcon(task.category), 
-                      size: 14, 
-                      color: Colors.grey.shade700,
+                      _getCategoryIcon(task.category),
+                      size: 16,
+                      color: _getCategoryColor(task.category),
                     ),
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    task.category, 
+                    task.category,
                     style: TextStyle(
-                      fontSize: 12, 
-                      color: Colors.grey.shade700,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      color: _getCategoryColor(task.category),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _getPriorityColor(task.priority).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: _getPriorityColor(task.priority).withOpacity(0.3),
-                        width: 0.5,
-                      ),
+                      color: _getPriorityColor(task.priority),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       task.priority,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: _getPriorityColor(task.priority),
+                        color: Colors.white,
                       ),
                     ),
                   ),

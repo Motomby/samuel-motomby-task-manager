@@ -81,70 +81,86 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: 50,
+                radius: 60,
+                backgroundColor: Colors.blue.shade100,
                 child: Text(
                   globalProfile.name.isNotEmpty
                       ? globalProfile.name[0].toUpperCase()
                       : '?',
-                  style: const TextStyle(fontSize: 40),
+                  style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               _buildEditableTextField(
                 controller: _nameController,
                 label: 'Name',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               _buildEditableTextField(
                 controller: _studentIdController,
                 label: 'Student ID',
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               _buildEditableTextField(
                 controller: _programmeController,
                 label: 'Programme',
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
-              const Align(
+              const SizedBox(height: 32),
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Bio',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.grey.shade800,
+                  ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               _buildEditableTextField(
                 controller: _bioController,
                 label: 'Bio',
                 maxLines: 4,
                 style: const TextStyle(fontSize: 16),
               ),
-              const SizedBox(height: 24),
-              const Align(
+              const SizedBox(height: 32),
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Top 3 Goals for the Semester',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.grey.shade800,
+                  ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               ...List.generate(_goalControllers.length, (index) {
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
+                  padding: const EdgeInsets.only(bottom: 12.0),
                   child: Row(
                     children: [
-                      const Icon(Icons.star, color: Colors.blue),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(Icons.star, color: Colors.blue.shade600, size: 20),
+                      ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: _buildEditableTextField(
@@ -157,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 );
               }),
-              const SizedBox(height: 32),
+              const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -165,10 +181,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icon(_isEditing ? Icons.save : Icons.edit),
                   label: Text(
                     _isEditing ? 'Save Profile' : 'Edit Profile',
-                    style: const TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade600,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 2,
                   ),
                 ),
               ),

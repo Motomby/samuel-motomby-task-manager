@@ -210,10 +210,13 @@ class _TaskListScreenState extends State<TaskListScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Card(
-              elevation: 0,
-              color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.4),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -222,7 +225,17 @@ class _TaskListScreenState extends State<TaskListScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildStatItem('Total', totalTasks),
+                        Container(
+                          height: 40,
+                          width: 1,
+                          color: Colors.grey.shade300,
+                        ),
                         _buildStatItem('Completed', completedTasks),
+                        Container(
+                          height: 40,
+                          width: 1,
+                          color: Colors.grey.shade300,
+                        ),
                         _buildStatItem('Pending', pendingTasks),
                       ],
                     ),
@@ -233,7 +246,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                         value: completionPercentage,
                         minHeight: 10,
                         backgroundColor: Colors.grey.shade200,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
                       ),
                     ),
                     const SizedBox(height: 8),

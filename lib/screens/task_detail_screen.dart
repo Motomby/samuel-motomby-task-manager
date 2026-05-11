@@ -59,9 +59,20 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   Color _getPriorityColor(String priority) {
     switch (priority) {
-      case 'High': return Colors.red;
-      case 'Medium': return Colors.orange;
-      case 'Low': return Colors.green;
+      case 'High': return const Color(0xFFDC3545);
+      case 'Medium': return const Color(0xFFFFC107);
+      case 'Low': return const Color(0xFF28A745);
+      default: return Colors.grey;
+    }
+  }
+
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'School': return const Color(0xFF5B7EDB);
+      case 'Personal': return const Color(0xFFA569BD);
+      case 'Health': return const Color(0xFFE85D75);
+      case 'Work': return const Color(0xFF28A745);
+      case 'Other': return const Color(0xFFFFA500);
       default: return Colors.grey;
     }
   }
@@ -143,8 +154,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 Chip(
                   avatar: Icon(_getCategoryIcon(widget.task.category), size: 16),
                   label: Text(widget.task.category),
-                  backgroundColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
-                  side: BorderSide.none,
+                  backgroundColor: _getCategoryColor(widget.task.category).withOpacity(0.15),
+                  labelStyle: TextStyle(
+                    color: _getCategoryColor(widget.task.category),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  side: BorderSide(
+                    color: _getCategoryColor(widget.task.category).withOpacity(0.3),
+                  ),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
                 const SizedBox(width: 8),

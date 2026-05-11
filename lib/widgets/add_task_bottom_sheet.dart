@@ -34,6 +34,26 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   ];
   final List<String> _priorities = ['High', 'Medium', 'Low'];
 
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'School': return const Color(0xFF5B7EDB);
+      case 'Personal': return const Color(0xFFA569BD);
+      case 'Health': return const Color(0xFFE85D75);
+      case 'Work': return const Color(0xFF28A745);
+      case 'Other': return const Color(0xFFFFA500);
+      default: return Colors.grey;
+    }
+  }
+
+  Color _getPriorityColor(String priority) {
+    switch (priority) {
+      case 'High': return const Color(0xFFDC3545);
+      case 'Medium': return const Color(0xFFFFC107);
+      case 'Low': return const Color(0xFF28A745);
+      default: return Colors.grey;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -180,9 +200,16 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                     value: category,
                     child: Row(
                       children: [
-                        Icon(icon, size: 20, color: Colors.grey.shade600),
-                        const SizedBox(width: 8),
-                        Text(category),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: _getCategoryColor(category).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(icon, size: 18, color: _getCategoryColor(category)),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(category, style: TextStyle(color: _getCategoryColor(category), fontWeight: FontWeight.w600)),
                       ],
                     ),
                   );
@@ -207,27 +234,20 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   border: OutlineInputBorder(),
                 ),
                 items: _priorities.map((priority) {
-                  Color color;
-                  switch (priority) {
-                    case 'High': color = Colors.red; break;
-                    case 'Medium': color = Colors.orange; break;
-                    case 'Low': color = Colors.green; break;
-                    default: color = Colors.grey;
-                  }
                   return DropdownMenuItem(
                     value: priority,
                     child: Row(
                       children: [
                         Container(
-                          width: 12,
-                          height: 12,
+                          width: 14,
+                          height: 14,
                           decoration: BoxDecoration(
-                            color: color,
+                            color: _getPriorityColor(priority),
                             shape: BoxShape.circle,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Text(priority),
+                        const SizedBox(width: 10),
+                        Text(priority, style: TextStyle(color: _getPriorityColor(priority), fontWeight: FontWeight.w600)),
                       ],
                     ),
                   );
@@ -269,11 +289,17 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
               ElevatedButton(
                 onPressed: _submitForm,
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade600,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 child: Text(
                   widget.existingTask == null ? 'Add Task' : 'Save Changes',
-                  style: const TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
               const SizedBox(height: 16),
