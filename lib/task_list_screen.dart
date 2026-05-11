@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'profile_screen.dart';
 import 'models/task.dart';
 import 'widgets/task_card.dart';
 import 'screens/task_detail_screen.dart';

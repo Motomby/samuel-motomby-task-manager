@@ -167,9 +167,24 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   border: OutlineInputBorder(),
                 ),
                 items: _categories.map((category) {
+                  IconData icon;
+                  switch (category) {
+                    case 'School': icon = Icons.school_outlined; break;
+                    case 'Personal': icon = Icons.person_outline; break;
+                    case 'Health': icon = Icons.favorite_border; break;
+                    case 'Work': icon = Icons.work_outline; break;
+                    case 'Other': icon = Icons.more_horiz; break;
+                    default: icon = Icons.task_outlined;
+                  }
                   return DropdownMenuItem(
                     value: category,
-                    child: Text(category),
+                    child: Row(
+                      children: [
+                        Icon(icon, size: 20, color: Colors.grey.shade600),
+                        const SizedBox(width: 8),
+                        Text(category),
+                      ],
+                    ),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -192,9 +207,29 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   border: OutlineInputBorder(),
                 ),
                 items: _priorities.map((priority) {
+                  Color color;
+                  switch (priority) {
+                    case 'High': color = Colors.red; break;
+                    case 'Medium': color = Colors.orange; break;
+                    case 'Low': color = Colors.green; break;
+                    default: color = Colors.grey;
+                  }
                   return DropdownMenuItem(
                     value: priority,
-                    child: Text(priority),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(priority),
+                      ],
+                    ),
                   );
                 }).toList(),
                 onChanged: (value) {
